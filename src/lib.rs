@@ -14,7 +14,7 @@ pub struct Dict {
     data: DictData,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct DictData {
     pub lang: String,
     pub provider: ProviderData,
@@ -50,14 +50,7 @@ impl Dict {
             }
         }
 
-        let mut data = DictData {
-            lang: String::from(""),
-            provider: ProviderData {
-                name: String::from(""),
-                desc: String::from(""),
-                file: String::from(""),
-            },
-        };
+        let mut data = Default::default();
 
         unsafe {
             enchant_dict_describe(dict, describe_fn, &mut data as *mut _ as *mut c_void);
@@ -192,7 +185,7 @@ pub struct Broker {
     broker: *mut EnchantBroker,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ProviderData {
     pub name: String,
     pub desc: String,
