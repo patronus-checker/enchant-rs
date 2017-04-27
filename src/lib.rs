@@ -81,7 +81,7 @@ impl Dict {
         }
     }
 
-    pub fn suggest(&self, word: &str) -> Box<Vec<String>> {
+    pub fn suggest(&self, word: &str) -> Vec<String> {
         unsafe {
             let mut n_suggs = 0;
 
@@ -102,7 +102,7 @@ impl Dict {
                 enchant_dict_free_string_list(self.dict, suggs);
             }
 
-            Box::new(out_suggestions)
+            out_suggestions
         }
     }
 
