@@ -251,7 +251,7 @@ impl Broker {
                                    file: *const c_char,
                                    user_data: *mut c_void) {
             unsafe {
-                let mut providers = user_data as *mut Vec<ProviderData>;
+                let providers = user_data as *mut Vec<ProviderData>;
                 let provider = ProviderData {
                     name: CStr::from_ptr(name).to_string_lossy().into_owned(),
                     desc: CStr::from_ptr(desc).to_string_lossy().into_owned(),
@@ -277,7 +277,7 @@ impl Broker {
                                provider_file: *const c_char,
                                user_data: *mut c_void) {
             unsafe {
-                let mut dicts = user_data as *mut Vec<DictData>;
+                let dicts = user_data as *mut Vec<DictData>;
                 let dict = DictData {
                     lang: CStr::from_ptr(lang).to_string_lossy().into_owned(),
                     provider: ProviderData {
