@@ -62,7 +62,7 @@ extern "C" {
     pub fn enchant_dict_suggest(dict: *mut EnchantDict,
                                 word: *const c_char,
                                 len: ssize_t,
-                                out_n_suggs: *const size_t)
+                                out_n_suggs: *mut size_t)
                                 -> *mut *mut c_char;
     pub fn enchant_dict_add(dict: *mut EnchantDict, word: *const c_char, len: ssize_t);
     pub fn enchant_dict_add_to_session(dict: *mut EnchantDict, word: *const c_char, len: ssize_t);

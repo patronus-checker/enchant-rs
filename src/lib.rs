@@ -64,10 +64,10 @@ impl Dict {
     }
 
     pub fn check(&self, word: &str) -> Result<bool, String> {
+        let word_length = word.len() as ssize_t;
+        let word_str = CString::new(word).unwrap();
         unsafe {
-            let word_length = word.len() as ssize_t;
-            let val =
-                enchant_dict_check(self.dict, CString::new(word).unwrap().as_ptr(), word_length);
+            let val = enchant_dict_check(self.dict, word_str.as_ptr(), word_length);
 
             if val == 0 {
                 Ok(true)
@@ -86,10 +86,9 @@ impl Dict {
             let mut n_suggs = 0;
 
             let word_length = word.len() as ssize_t;
-            let suggs = enchant_dict_suggest(self.dict,
-                                             CString::new(word).unwrap().as_ptr(),
-                                             word_length,
-                                             &mut n_suggs);
+            let word_str = CString::new(word).unwrap();
+            let suggs =
+                enchant_dict_suggest(self.dict, word_str.as_ptr(), word_length, &mut n_suggs);
             let mut out_suggestions = Vec::with_capacity(n_suggs as usize);
 
             if !suggs.is_null() && n_suggs != 0 {
@@ -107,77 +106,81 @@ impl Dict {
     }
 
     pub fn add(&self, word: &str) {
+        let word_length = word.len() as ssize_t;
+        let word_str = CString::new(word).unwrap();
         unsafe {
-            let word_length = word.len() as ssize_t;
-            enchant_dict_add(self.dict, CString::new(word).unwrap().as_ptr(), word_length);
+            enchant_dict_add(self.dict, word_str.as_ptr(), word_length);
         }
     }
 
     pub fn add_to_session(&self, word: &str) {
+        let word_length = word.len() as ssize_t;
+        let word_str = CString::new(word).unwrap();
         unsafe {
-            let word_length = word.len() as ssize_t;
-            enchant_dict_add_to_session(self.dict,
-                                        CString::new(word).unwrap().as_ptr(),
-                                        word_length);
+            enchant_dict_add_to_session(self.dict, word_str.as_ptr(), word_length);
         }
     }
 
     pub fn is_added(&self, word: &str) {
+        let word_length = word.len() as ssize_t;
+        let word_str = CString::new(word).unwrap();
         unsafe {
-            let word_length = word.len() as ssize_t;
-            enchant_dict_is_added(self.dict, CString::new(word).unwrap().as_ptr(), word_length);
+            enchant_dict_is_added(self.dict, word_str.as_ptr(), word_length);
         }
     }
 
     pub fn remove(&self, word: &str) {
+        let word_length = word.len() as ssize_t;
+        let word_str = CString::new(word).unwrap();
         unsafe {
-            let word_length = word.len() as ssize_t;
-            enchant_dict_remove(self.dict, CString::new(word).unwrap().as_ptr(), word_length);
+            enchant_dict_remove(self.dict, word_str.as_ptr(), word_length);
         }
     }
 
     pub fn remove_from_session(&self, word: &str) {
+        let word_length = word.len() as ssize_t;
+        let word_str = CString::new(word).unwrap();
         unsafe {
-            let word_length = word.len() as ssize_t;
-            enchant_dict_remove_from_session(self.dict,
-                                             CString::new(word).unwrap().as_ptr(),
-                                             word_length);
+            enchant_dict_remove_from_session(self.dict, word_str.as_ptr(), word_length);
         }
     }
 
     pub fn is_removed(&self, word: &str) {
+        let word_length = word.len() as ssize_t;
+        let word_str = CString::new(word).unwrap();
         unsafe {
-            let word_length = word.len() as ssize_t;
-            enchant_dict_is_removed(self.dict, CString::new(word).unwrap().as_ptr(), word_length);
+            enchant_dict_is_removed(self.dict, word_str.as_ptr(), word_length);
         }
     }
 
     pub fn store_replacement(&self, bad: &str, good: &str) {
+        let bad_length = bad.len() as ssize_t;
+        let bad_str = CString::new(bad).unwrap();
+        let good_length = good.len() as ssize_t;
+        let good_str = CString::new(good).unwrap();
         unsafe {
-            let bad_length = bad.len() as ssize_t;
-            let good_length = good.len() as ssize_t;
             enchant_dict_store_replacement(self.dict,
-                                           CString::new(bad).unwrap().as_ptr(),
+                                           bad_str.as_ptr(),
                                            bad_length,
-                                           CString::new(good).unwrap().as_ptr(),
+                                           good_str.as_ptr(),
                                            good_length);
         }
     }
 
     pub fn get_lang(&self) -> &str {
-        return self.data.lang.as_str();
+        self.data.lang.as_str()
     }
 
     pub fn get_provider_name(&self) -> &str {
-        return self.data.provider.name.as_str();
+        self.data.provider.name.as_str()
     }
 
     pub fn get_provider_desc(&self) -> &str {
-        return self.data.provider.desc.as_str();
+        self.data.provider.desc.as_str()
     }
 
     pub fn get_provider_file(&self) -> &str {
-        return self.data.provider.file.as_str();
+        self.data.provider.file.as_str()
     }
 }
 
@@ -199,8 +202,8 @@ impl Broker {
 
     pub fn request_dict(&mut self, lang: &str) -> Result<Dict, String> {
         unsafe {
-            let dict = enchant_broker_request_dict(self.broker,
-                                                   CString::new(lang).unwrap().as_ptr());
+            let lang_str = CString::new(lang).unwrap();
+            let dict = enchant_broker_request_dict(self.broker, lang_str.as_ptr());
 
             if dict.is_null() {
                 let err = enchant_broker_get_error(self.broker);
@@ -217,8 +220,8 @@ impl Broker {
 
     pub fn request_pwl_dict(&mut self, pwl: &str) -> Result<Dict, String> {
         unsafe {
-            let dict = enchant_broker_request_pwl_dict(self.broker,
-                                                       CString::new(pwl).unwrap().as_ptr());
+            let pwl_str = CString::new(pwl).unwrap();
+            let dict = enchant_broker_request_pwl_dict(self.broker, pwl_str.as_ptr());
 
             if dict.is_null() {
                 Err(CStr::from_ptr(enchant_broker_get_error(self.broker))
@@ -231,16 +234,15 @@ impl Broker {
     }
 
     pub fn dict_exists(&mut self, lang: &str) -> bool {
-        unsafe {
-            enchant_broker_dict_exists(self.broker, CString::new(lang).unwrap().as_ptr()) == 1
-        }
+        let lang_str = CString::new(lang).unwrap();
+        unsafe { enchant_broker_dict_exists(self.broker, lang_str.as_ptr()) == 1 }
     }
 
     pub fn set_ordering(&mut self, tag: &str, ordering: &str) {
+        let tag_str = CString::new(tag).unwrap();
+        let ordering_str = CString::new(ordering).unwrap();
         unsafe {
-            enchant_broker_set_ordering(self.broker,
-                                        CString::new(tag).unwrap().as_ptr(),
-                                        CString::new(ordering).unwrap().as_ptr());
+            enchant_broker_set_ordering(self.broker, tag_str.as_ptr(), ordering_str.as_ptr());
         }
     }
 
@@ -319,9 +321,9 @@ pub fn version() -> String {
     }
 }
 
-pub fn set_prefix_dir(prefix: &str) {
-    let dir = CString::new(prefix).unwrap().as_ptr();
+pub fn set_prefix_dir(dir: &str) {
+    let dir_str = CString::new(dir).unwrap();
     unsafe {
-        enchant_set_prefix_dir(dir);
+        enchant_set_prefix_dir(dir_str.as_ptr());
     }
 }
