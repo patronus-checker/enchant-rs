@@ -1,9 +1,6 @@
-extern crate libc;
-
 use std::ffi::CStr;
 use std::ffi::CString;
-use libc::{ssize_t, c_void};
-use std::os::raw::c_char;
+use std::os::raw::{c_void, c_char};
 use bindings::*;
 
 mod bindings;
@@ -64,7 +61,7 @@ impl Dict {
     }
 
     pub fn check(&self, word: &str) -> Result<bool, String> {
-        let word_length = word.len() as ssize_t;
+        let word_length = word.len() as isize;
         let word_str = CString::new(word).unwrap();
         unsafe {
             let val = enchant_dict_check(self.dict, word_str.as_ptr(), word_length);
@@ -85,7 +82,7 @@ impl Dict {
         unsafe {
             let mut n_suggs = 0;
 
-            let word_length = word.len() as ssize_t;
+            let word_length = word.len() as isize;
             let word_str = CString::new(word).unwrap();
             let suggs =
                 enchant_dict_suggest(self.dict, word_str.as_ptr(), word_length, &mut n_suggs);
@@ -106,7 +103,7 @@ impl Dict {
     }
 
     pub fn add(&self, word: &str) {
-        let word_length = word.len() as ssize_t;
+        let word_length = word.len() as isize;
         let word_str = CString::new(word).unwrap();
         unsafe {
             enchant_dict_add(self.dict, word_str.as_ptr(), word_length);
@@ -114,7 +111,7 @@ impl Dict {
     }
 
     pub fn add_to_session(&self, word: &str) {
-        let word_length = word.len() as ssize_t;
+        let word_length = word.len() as isize;
         let word_str = CString::new(word).unwrap();
         unsafe {
             enchant_dict_add_to_session(self.dict, word_str.as_ptr(), word_length);
@@ -122,7 +119,7 @@ impl Dict {
     }
 
     pub fn is_added(&self, word: &str) {
-        let word_length = word.len() as ssize_t;
+        let word_length = word.len() as isize;
         let word_str = CString::new(word).unwrap();
         unsafe {
             enchant_dict_is_added(self.dict, word_str.as_ptr(), word_length);
@@ -130,7 +127,7 @@ impl Dict {
     }
 
     pub fn remove(&self, word: &str) {
-        let word_length = word.len() as ssize_t;
+        let word_length = word.len() as isize;
         let word_str = CString::new(word).unwrap();
         unsafe {
             enchant_dict_remove(self.dict, word_str.as_ptr(), word_length);
@@ -138,7 +135,7 @@ impl Dict {
     }
 
     pub fn remove_from_session(&self, word: &str) {
-        let word_length = word.len() as ssize_t;
+        let word_length = word.len() as isize;
         let word_str = CString::new(word).unwrap();
         unsafe {
             enchant_dict_remove_from_session(self.dict, word_str.as_ptr(), word_length);
@@ -146,7 +143,7 @@ impl Dict {
     }
 
     pub fn is_removed(&self, word: &str) {
-        let word_length = word.len() as ssize_t;
+        let word_length = word.len() as isize;
         let word_str = CString::new(word).unwrap();
         unsafe {
             enchant_dict_is_removed(self.dict, word_str.as_ptr(), word_length);
@@ -154,9 +151,9 @@ impl Dict {
     }
 
     pub fn store_replacement(&self, bad: &str, good: &str) {
-        let bad_length = bad.len() as ssize_t;
+        let bad_length = bad.len() as isize;
         let bad_str = CString::new(bad).unwrap();
-        let good_length = good.len() as ssize_t;
+        let good_length = good.len() as isize;
         let good_str = CString::new(good).unwrap();
         unsafe {
             enchant_dict_store_replacement(self.dict,

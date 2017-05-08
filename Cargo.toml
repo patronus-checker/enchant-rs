@@ -3,6 +3,3 @@ name = "enchant"
 version = "0.1.0"
 authors = ["Jan Tojnar <jtojnar@gmail.com>"]
 license = "LGPL-2.1"
-
-[dependencies]
-libc = "0.2.21"

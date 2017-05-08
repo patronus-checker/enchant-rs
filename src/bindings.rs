@@ -1,7 +1,4 @@
-extern crate libc;
-
-use libc::{c_int, size_t, ssize_t, c_void};
-use std::os::raw::c_char;
+use std::os::raw::{c_int, c_char, c_void};
 
 pub enum EnchantBroker {}
 pub enum EnchantDict {}
@@ -58,32 +55,29 @@ extern "C" {
                                    f: EnchantBrokerDescribeFn,
                                    user_data: *mut c_void);
 
-    pub fn enchant_dict_check(dict: *mut EnchantDict, word: *const c_char, len: ssize_t) -> c_int;
+    pub fn enchant_dict_check(dict: *mut EnchantDict, word: *const c_char, len: isize) -> c_int;
     pub fn enchant_dict_suggest(dict: *mut EnchantDict,
                                 word: *const c_char,
-                                len: ssize_t,
-                                out_n_suggs: *mut size_t)
+                                len: isize,
+                                out_n_suggs: *mut usize)
                                 -> *mut *mut c_char;
-    pub fn enchant_dict_add(dict: *mut EnchantDict, word: *const c_char, len: ssize_t);
-    pub fn enchant_dict_add_to_session(dict: *mut EnchantDict, word: *const c_char, len: ssize_t);
-    pub fn enchant_dict_remove(dict: *mut EnchantDict, word: *const c_char, len: ssize_t);
+    pub fn enchant_dict_add(dict: *mut EnchantDict, word: *const c_char, len: isize);
+    pub fn enchant_dict_add_to_session(dict: *mut EnchantDict, word: *const c_char, len: isize);
+    pub fn enchant_dict_remove(dict: *mut EnchantDict, word: *const c_char, len: isize);
     pub fn enchant_dict_remove_from_session(dict: *mut EnchantDict,
                                             word: *const c_char,
-                                            len: ssize_t);
-    pub fn enchant_dict_is_added(dict: *mut EnchantDict,
-                                 word: *const c_char,
-                                 len: ssize_t)
-                                 -> c_int;
+                                            len: isize);
+    pub fn enchant_dict_is_added(dict: *mut EnchantDict, word: *const c_char, len: isize) -> c_int;
     pub fn enchant_dict_is_removed(dict: *mut EnchantDict,
                                    word: *const c_char,
-                                   len: ssize_t)
+                                   len: isize)
                                    -> c_int;
 
     pub fn enchant_dict_store_replacement(dict: *mut EnchantDict,
                                           mis: *const c_char,
-                                          mis_len: ssize_t,
+                                          mis_len: isize,
                                           cor: *const c_char,
-                                          cor_len: ssize_t);
+                                          cor_len: isize);
     pub fn enchant_dict_free_string_list(dict: *mut EnchantDict, string_list: *mut *mut c_char);
 
     pub fn enchant_dict_get_error(dict: *mut EnchantDict) -> *const c_char;
