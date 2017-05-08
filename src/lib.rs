@@ -317,10 +317,3 @@ pub fn version() -> String {
             .into_owned()
     }
 }
-
-pub fn set_prefix_dir(dir: &str) {
-    let dir_str = CString::new(dir).unwrap();
-    unsafe {
-        enchant_set_prefix_dir(dir_str.as_ptr());
-    }
-}

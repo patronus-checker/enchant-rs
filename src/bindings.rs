@@ -90,6 +90,4 @@ extern "C" {
     pub fn enchant_broker_list_dicts(broker: *mut EnchantBroker,
                                      f: EnchantDictDescribeFn,
                                      user_data: *mut c_void);
-
-    pub fn enchant_set_prefix_dir(broker: *const c_char);
 }
