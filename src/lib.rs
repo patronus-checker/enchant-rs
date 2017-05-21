@@ -1,9 +1,9 @@
 extern crate enchant_sys;
 
+use enchant_sys::*;
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::{c_void, c_char};
-use enchant_sys::*;
 
 pub struct Dict {
     dict: *mut EnchantDict,
@@ -35,15 +35,12 @@ impl Dict {
             unsafe {
                 let mut dict = user_data as *mut DictData;
                 (*dict).lang = CStr::from_ptr(lang).to_string_lossy().into_owned();
-                (*dict).provider.name = CStr::from_ptr(provider_name)
-                    .to_string_lossy()
-                    .into_owned();
-                (*dict).provider.desc = CStr::from_ptr(provider_desc)
-                    .to_string_lossy()
-                    .into_owned();
-                (*dict).provider.file = CStr::from_ptr(provider_file)
-                    .to_string_lossy()
-                    .into_owned();
+                (*dict).provider.name =
+                    CStr::from_ptr(provider_name).to_string_lossy().into_owned();
+                (*dict).provider.desc =
+                    CStr::from_ptr(provider_desc).to_string_lossy().into_owned();
+                (*dict).provider.file =
+                    CStr::from_ptr(provider_file).to_string_lossy().into_owned();
             }
         }
 
@@ -53,7 +50,7 @@ impl Dict {
             enchant_dict_describe(dict, describe_fn, &mut data as *mut _ as *mut c_void);
         };
 
-        Dict {
+        Self {
             dict: dict,
             broker: broker,
             data: data,
@@ -194,7 +191,7 @@ pub struct ProviderData {
 
 impl Broker {
     pub fn new() -> Self {
-        unsafe { Broker { broker: enchant_broker_init() } }
+        unsafe { Self { broker: enchant_broker_init() } }
     }
 
     pub fn request_dict(&mut self, lang: &str) -> Result<Dict, String> {
@@ -280,15 +277,9 @@ impl Broker {
                 let dict = DictData {
                     lang: CStr::from_ptr(lang).to_string_lossy().into_owned(),
                     provider: ProviderData {
-                        name: CStr::from_ptr(provider_name)
-                            .to_string_lossy()
-                            .into_owned(),
-                        desc: CStr::from_ptr(provider_desc)
-                            .to_string_lossy()
-                            .into_owned(),
-                        file: CStr::from_ptr(provider_file)
-                            .to_string_lossy()
-                            .into_owned(),
+                        name: CStr::from_ptr(provider_name).to_string_lossy().into_owned(),
+                        desc: CStr::from_ptr(provider_desc).to_string_lossy().into_owned(),
+                        file: CStr::from_ptr(provider_file).to_string_lossy().into_owned(),
                     },
                 };
                 (*dicts).push(dict);
