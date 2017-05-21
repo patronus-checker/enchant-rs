@@ -1,9 +1,9 @@
+extern crate enchant_sys;
+
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::{c_void, c_char};
-use bindings::*;
-
-mod bindings;
+use enchant_sys::*;
 
 pub struct Dict {
     dict: *mut EnchantDict,
