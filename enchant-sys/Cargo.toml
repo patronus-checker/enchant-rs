@@ -2,5 +2,7 @@
 name = "enchant-sys"
 version = "0.1.0"
 authors = ["Jan Tojnar <jtojnar@gmail.com>"]
+links = "enchant"
 
-[dependencies]
+[build-dependencies]
+pkg-config = "0.3"

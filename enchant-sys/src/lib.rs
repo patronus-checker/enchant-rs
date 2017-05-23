@@ -30,7 +30,6 @@ pub type EnchantDictDescribeFn = extern "C" fn(lang_tag: *const c_char,
                                                provider_file: *const c_char,
                                                user_data: *mut c_void);
 
-#[link(name = "enchant")]
 extern "C" {
     pub fn enchant_get_version() -> *const c_char;
 
