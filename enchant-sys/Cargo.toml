@@ -2,6 +2,8 @@
 name = "enchant-sys"
 version = "0.1.0"
 authors = ["Jan Tojnar <jtojnar@gmail.com>"]
+description = "FFI bindings to Enchant"
+license = "LGPL-2.1"
 links = "enchant"
 
 [build-dependencies]
