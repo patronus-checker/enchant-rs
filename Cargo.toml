@@ -9,4 +9,4 @@ keywords = ["enchant", "spell", "spellcheck"]
 license = "LGPL-2.1"
 
 [dependencies]
-enchant-sys = {path = "enchant-sys"}
+enchant-sys = {path = "enchant-sys", version = "0.1"}
