@@ -1,7 +1,16 @@
 use std::os::raw::{c_char, c_int, c_void};
 
-pub enum EnchantBroker {}
-pub enum EnchantDict {}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct EnchantBroker {
+    _unused: [u8; 0],
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct EnchantDict {
+    _unused: [u8; 0],
+}
 
 // EnchantBrokerDescribeFn
 // @provider_name: The provider's identifier, such as "hunspell" or "aspell", in UTF8 encoding
