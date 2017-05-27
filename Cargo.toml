@@ -2,6 +2,10 @@
 name = "enchant"
 version = "0.1.0"
 authors = ["Jan Tojnar <jtojnar@gmail.com>"]
+description = "Bindings for Enchant spell checking library"
+repository = "https://github.com/patronus-checker/enchant-rs.git"
+readme = "README.md"
+keywords = ["enchant", "spell", "spellcheck"]
 license = "LGPL-2.1"
 
 [dependencies]
