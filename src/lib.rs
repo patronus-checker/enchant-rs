@@ -3,7 +3,7 @@ extern crate enchant_sys;
 use enchant_sys::*;
 use std::ffi::CStr;
 use std::ffi::CString;
-use std::os::raw::{c_void, c_char};
+use std::os::raw::{c_char, c_void};
 
 pub struct Dict {
     dict: *mut EnchantDict,
@@ -27,11 +27,13 @@ impl Drop for Dict {
 
 impl Dict {
     fn new(dict: *mut EnchantDict, broker: *mut EnchantBroker) -> Self {
-        extern "C" fn describe_fn(lang: *const c_char,
-                                  provider_name: *const c_char,
-                                  provider_desc: *const c_char,
-                                  provider_file: *const c_char,
-                                  user_data: *mut c_void) {
+        extern "C" fn describe_fn(
+            lang: *const c_char,
+            provider_name: *const c_char,
+            provider_desc: *const c_char,
+            provider_file: *const c_char,
+            user_data: *mut c_void,
+        ) {
             unsafe {
                 let mut dict = user_data as *mut DictData;
                 (*dict).lang = CStr::from_ptr(lang).to_string_lossy().into_owned();
@@ -69,8 +71,8 @@ impl Dict {
                 Ok(false)
             } else {
                 Err(CStr::from_ptr(enchant_dict_get_error(self.dict))
-                        .to_string_lossy()
-                        .into_owned())
+                    .to_string_lossy()
+                    .into_owned())
             }
         }
     }
@@ -87,9 +89,11 @@ impl Dict {
 
             if !suggs.is_null() && n_suggs != 0 {
                 for i in 0..n_suggs {
-                    out_suggestions.push(CStr::from_ptr(*suggs.offset(i as isize))
-                                             .to_string_lossy()
-                                             .into_owned());
+                    out_suggestions.push(
+                        CStr::from_ptr(*suggs.offset(i as isize))
+                            .to_string_lossy()
+                            .into_owned(),
+                    );
                 }
 
                 enchant_dict_free_string_list(self.dict, suggs);
@@ -153,11 +157,13 @@ impl Dict {
         let good_length = good.len() as isize;
         let good_str = CString::new(good).unwrap();
         unsafe {
-            enchant_dict_store_replacement(self.dict,
-                                           bad_str.as_ptr(),
-                                           bad_length,
-                                           good_str.as_ptr(),
-                                           good_length);
+            enchant_dict_store_replacement(
+                self.dict,
+                bad_str.as_ptr(),
+                bad_length,
+                good_str.as_ptr(),
+                good_length,
+            );
         }
     }
 
@@ -191,7 +197,11 @@ pub struct ProviderData {
 
 impl Broker {
     pub fn new() -> Self {
-        unsafe { Self { broker: enchant_broker_init() } }
+        unsafe {
+            Self {
+                broker: enchant_broker_init(),
+            }
+        }
     }
 
     pub fn request_dict(&mut self, lang: &str) -> Result<Dict, String> {
@@ -219,8 +229,8 @@ impl Broker {
 
             if dict.is_null() {
                 Err(CStr::from_ptr(enchant_broker_get_error(self.broker))
-                        .to_string_lossy()
-                        .into_owned())
+                    .to_string_lossy()
+                    .into_owned())
             } else {
                 Ok(Dict::new(dict, self.broker))
             }
@@ -242,10 +252,12 @@ impl Broker {
 
     pub fn list_providers(&mut self) -> Vec<ProviderData> {
         let mut providers = Vec::new();
-        extern "C" fn add_provider(name: *const c_char,
-                                   desc: *const c_char,
-                                   file: *const c_char,
-                                   user_data: *mut c_void) {
+        extern "C" fn add_provider(
+            name: *const c_char,
+            desc: *const c_char,
+            file: *const c_char,
+            user_data: *mut c_void,
+        ) {
             unsafe {
                 let providers = user_data as *mut Vec<ProviderData>;
                 let provider = ProviderData {
@@ -258,20 +270,24 @@ impl Broker {
         }
 
         unsafe {
-            enchant_broker_describe(self.broker,
-                                    add_provider,
-                                    &mut providers as *mut _ as *mut c_void);
+            enchant_broker_describe(
+                self.broker,
+                add_provider,
+                &mut providers as *mut _ as *mut c_void,
+            );
         }
         providers
     }
 
     pub fn list_dicts(&mut self) -> Vec<DictData> {
         let mut dicts = Vec::new();
-        extern "C" fn add_dict(lang: *const c_char,
-                               provider_name: *const c_char,
-                               provider_desc: *const c_char,
-                               provider_file: *const c_char,
-                               user_data: *mut c_void) {
+        extern "C" fn add_dict(
+            lang: *const c_char,
+            provider_name: *const c_char,
+            provider_desc: *const c_char,
+            provider_file: *const c_char,
+            user_data: *mut c_void,
+        ) {
             unsafe {
                 let dicts = user_data as *mut Vec<DictData>;
                 let dict = DictData {
