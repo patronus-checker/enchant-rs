@@ -1,6 +1,6 @@
 [package]
 name = "enchant"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Jan Tojnar <jtojnar@gmail.com>"]
 description = "Bindings for Enchant spell checking library"
 repository = "https://github.com/patronus-checker/enchant-rs.git"
@@ -9,4 +9,4 @@ keywords = ["enchant", "spell", "spellcheck"]
 license = "LGPL-2.1"
 
 [dependencies]
-enchant-sys = {path = "enchant-sys", version = "0.1"}
+enchant-sys = {path = "enchant-sys", version = "0.2"}
