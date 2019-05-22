@@ -60,6 +60,10 @@ impl Dict {
     }
 
     pub fn check(&self, word: &str) -> Result<bool, String> {
+        if word.is_empty() {
+            return Err(String::from("empty strings cannot be checked"));
+        }
+
         let word_length = word.len() as isize;
         let word_str = CString::new(word).unwrap();
         unsafe {
