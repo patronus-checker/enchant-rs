@@ -1,0 +1,16 @@
+name: Rust
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v7
+    - name: Build
+      run: nix-shell -p enchant -p pkg-config --run "cargo build --verbose"
+    - name: Run tests
+      run: nix-shell -p enchant -p pkg-config --run "cargo test --verbose"
