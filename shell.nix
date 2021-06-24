@@ -21,4 +21,10 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     enchant
   ];
+
+  XDG_DATA_DIRS =
+    with pkgs;
+    lib.makeSearchPath "share" [
+      hunspellDicts.en-us
+    ];
 }

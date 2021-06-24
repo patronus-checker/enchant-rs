@@ -4,10 +4,11 @@ use enchant_sys::*;
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::{c_char, c_void};
+use std::rc::Rc;
 
 pub struct Dict {
     dict: *mut EnchantDict,
-    broker: *mut EnchantBroker,
+    broker_holder: Rc<BrokerHolder>,
     data: DictData,
 }
 
@@ -20,13 +21,13 @@ pub struct DictData {
 impl Drop for Dict {
     fn drop(&mut self) {
         unsafe {
-            enchant_broker_free_dict(self.broker, self.dict);
+            enchant_broker_free_dict(self.broker_holder.broker, self.dict);
         }
     }
 }
 
 impl Dict {
-    fn new(dict: *mut EnchantDict, broker: *mut EnchantBroker) -> Self {
+    fn new(dict: *mut EnchantDict, broker_holder: Rc<BrokerHolder>) -> Self {
         extern "C" fn describe_fn(
             lang: *const c_char,
             provider_name: *const c_char,
@@ -54,7 +55,7 @@ impl Dict {
 
         Self {
             dict: dict,
-            broker: broker,
+            broker_holder: broker_holder,
             data: data,
         }
     }
@@ -188,8 +189,20 @@ impl Dict {
     }
 }
 
-pub struct Broker {
+struct BrokerHolder {
     broker: *mut EnchantBroker,
+}
+
+impl Drop for BrokerHolder {
+    fn drop(&mut self) {
+        unsafe {
+            enchant_broker_free(self.broker);
+        }
+    }
+}
+
+pub struct Broker {
+    broker_holder: Rc<BrokerHolder>,
 }
 
 #[derive(Debug, Default)]
@@ -203,7 +216,7 @@ impl Broker {
     pub fn new() -> Self {
         unsafe {
             Self {
-                broker: enchant_broker_init(),
+                broker_holder: Rc::new(BrokerHolder { broker: enchant_broker_init() }),
             }
         }
     }
@@ -211,17 +224,17 @@ impl Broker {
     pub fn request_dict(&mut self, lang: &str) -> Result<Dict, String> {
         unsafe {
             let lang_str = CString::new(lang).unwrap();
-            let dict = enchant_broker_request_dict(self.broker, lang_str.as_ptr());
+            let dict = enchant_broker_request_dict(self.broker_holder.broker, lang_str.as_ptr());
 
             if dict.is_null() {
-                let err = enchant_broker_get_error(self.broker);
+                let err = enchant_broker_get_error(self.broker_holder.broker);
                 if err.is_null() {
                     Err(String::from("dictionary not found"))
                 } else {
                     Err(CStr::from_ptr(err).to_string_lossy().into_owned())
                 }
             } else {
-                Ok(Dict::new(dict, self.broker))
+                Ok(Dict::new(dict, self.broker_holder.clone()))
             }
         }
     }
@@ -229,28 +242,28 @@ impl Broker {
     pub fn request_pwl_dict(&mut self, pwl: &str) -> Result<Dict, String> {
         unsafe {
             let pwl_str = CString::new(pwl).unwrap();
-            let dict = enchant_broker_request_pwl_dict(self.broker, pwl_str.as_ptr());
+            let dict = enchant_broker_request_pwl_dict(self.broker_holder.broker, pwl_str.as_ptr());
 
             if dict.is_null() {
-                Err(CStr::from_ptr(enchant_broker_get_error(self.broker))
+                Err(CStr::from_ptr(enchant_broker_get_error(self.broker_holder.broker))
                     .to_string_lossy()
                     .into_owned())
             } else {
-                Ok(Dict::new(dict, self.broker))
+                Ok(Dict::new(dict, self.broker_holder.clone()))
             }
         }
     }
 
     pub fn dict_exists(&mut self, lang: &str) -> bool {
         let lang_str = CString::new(lang).unwrap();
-        unsafe { enchant_broker_dict_exists(self.broker, lang_str.as_ptr()) == 1 }
+        unsafe { enchant_broker_dict_exists(self.broker_holder.broker, lang_str.as_ptr()) == 1 }
     }
 
     pub fn set_ordering(&mut self, tag: &str, ordering: &str) {
         let tag_str = CString::new(tag).unwrap();
         let ordering_str = CString::new(ordering).unwrap();
         unsafe {
-            enchant_broker_set_ordering(self.broker, tag_str.as_ptr(), ordering_str.as_ptr());
+            enchant_broker_set_ordering(self.broker_holder.broker, tag_str.as_ptr(), ordering_str.as_ptr());
         }
     }
 
@@ -275,7 +288,7 @@ impl Broker {
 
         unsafe {
             enchant_broker_describe(
-                self.broker,
+                self.broker_holder.broker,
                 add_provider,
                 &mut providers as *mut _ as *mut c_void,
             );
@@ -307,17 +320,9 @@ impl Broker {
         }
 
         unsafe {
-            enchant_broker_list_dicts(self.broker, add_dict, &mut dicts as *mut _ as *mut c_void);
+            enchant_broker_list_dicts(self.broker_holder.broker, add_dict, &mut dicts as *mut _ as *mut c_void);
         }
         dicts
-    }
-}
-
-impl Drop for Broker {
-    fn drop(&mut self) {
-        unsafe {
-            enchant_broker_free(self.broker);
-        }
     }
 }
 

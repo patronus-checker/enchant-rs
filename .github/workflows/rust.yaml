@@ -13,4 +13,4 @@ jobs:
     - name: Build
       run: nix-shell --run "cargo build --verbose"
     - name: Run tests
-      run: nix-shell --run "cargo test --verbose"
+      run: nix-shell --run "env G_DEBUG=fatal-warnings cargo test --verbose"
