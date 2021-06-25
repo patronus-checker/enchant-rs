@@ -5,9 +5,9 @@ use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::{c_char, c_void};
 
-pub struct Dict {
+pub struct Dict<'broker> {
     dict: *mut EnchantDict,
-    broker: *mut EnchantBroker,
+    broker: &'broker mut EnchantBroker,
     data: DictData,
 }
 
@@ -17,7 +17,7 @@ pub struct DictData {
     pub provider: ProviderData,
 }
 
-impl Drop for Dict {
+impl<'broker> Drop for Dict<'broker> {
     fn drop(&mut self) {
         unsafe {
             enchant_broker_free_dict(self.broker, self.dict);
@@ -25,8 +25,8 @@ impl Drop for Dict {
     }
 }
 
-impl Dict {
-    fn new(dict: *mut EnchantDict, broker: *mut EnchantBroker) -> Self {
+impl<'broker> Dict<'broker> {
+    fn new(dict: *mut EnchantDict, broker: &'broker mut EnchantBroker) -> Self {
         extern "C" fn describe_fn(
             lang: *const c_char,
             provider_name: *const c_char,
@@ -221,7 +221,7 @@ impl Broker {
                     Err(CStr::from_ptr(err).to_string_lossy().into_owned())
                 }
             } else {
-                Ok(Dict::new(dict, self.broker))
+                Ok(Dict::new(dict, &mut *self.broker))
             }
         }
     }
@@ -236,7 +236,7 @@ impl Broker {
                     .to_string_lossy()
                     .into_owned())
             } else {
-                Ok(Dict::new(dict, self.broker))
+                Ok(Dict::new(dict, &mut *self.broker))
             }
         }
     }
@@ -326,5 +326,33 @@ pub fn version() -> String {
         CStr::from_ptr(enchant_get_version())
             .to_string_lossy()
             .into_owned()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    struct Foo<'broker> {
+        dict: Dict<'broker>,
+    }
+
+    impl<'broker> Foo<'broker> {
+        fn new(broker: &'broker mut Broker) -> Self {
+            let dict = broker.request_dict("en_US").unwrap();
+            Self { dict }
+        }
+
+        fn check(&mut self, word: &str) -> bool {
+            self.dict.check(word).unwrap()
+        }
+    }
+
+    #[test]
+    fn test_check() {
+        let mut broker = Broker::new();
+        let mut foo = Foo::new(&mut broker);
+        assert!(!foo.check("misssstake"));
     }
 }
