@@ -1,4 +1,4 @@
-### v0.3.0 (unreleased)
+### v0.3.0 (2021-06-27)
 * Fixed premature freeing of Broker (https://github.com/patronus-checker/enchant-rs/issues/4).
 * Minor **BC break**: Broker no longer implements `Drop` trait, it was moved to internal reference-counted value. (https://github.com/patronus-checker/enchant-rs/pull/5).
 

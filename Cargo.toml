@@ -1,6 +1,6 @@
 [package]
 name = "enchant"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Jan Tojnar <jtojnar@gmail.com>"]
 description = "Bindings for Enchant spell checking library"
 repository = "https://github.com/patronus-checker/enchant-rs.git"
