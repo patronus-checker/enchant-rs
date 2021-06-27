@@ -6,7 +6,7 @@ description = "Bindings for Enchant spell checking library"
 repository = "https://github.com/patronus-checker/enchant-rs.git"
 readme = "README.md"
 keywords = ["enchant", "spell", "spellcheck"]
-license = "LGPL-2.1"
+license = "LGPL-2.1-or-later"
 
 [dependencies]
 enchant-sys = {path = "enchant-sys", version = "0.2"}
